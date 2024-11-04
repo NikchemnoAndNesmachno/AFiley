@@ -1,0 +1,34 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AFiley"
+        xmlns:interfaces="clr-namespace:FileyCore.Interfaces;assembly=FileyCore">
+    <Design.PreviewWith>
+        <controls:AFiley/>
+    </Design.PreviewWith>
+    <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/>
+    <Style Selector="controls|AFiley">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel>
+                    <StackPanel
+                        DockPanel.Dock="Top"
+                        Orientation="Vertical">
+                        <TextBox Text="{Binding CurrentPath,
+                         RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"/>
+                        <StackPanel Orientation="Horizontal">
+                           <Button Content="Оновити"
+                                   Command="{Binding $parent[controls:AFiley].Load}"/>
+                           <Button Content="Перейти"
+                                   Command="{Binding $parent[controls:AFiley].Browse}"/>
+                           <TextBlock Text="{TemplateBinding SelectedIndex}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <TreeDataGrid
+                        x:Name="PART_tree"
+                        MinHeight="100"
+                        Source="{TemplateBinding FileSource}"/>
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>
