@@ -15,4 +15,11 @@
       <ProjectReference Include="..\FileyCore\FileyCore.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="FileSizeTemplate.axaml.cs">
+        <DependentUpon>FileSizeTemplate.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
 </Project>

@@ -10,23 +10,36 @@ public class OFileyFabric: IFileyFabric<OFiley>
         var segment = new Uri(path).Segments[^1];
         return Uri.UnescapeDataString(segment.Length == 1 ? segment : segment.TrimEnd('/'));
     }
-        
-    public OFiley CreateFile(string path, IFileyItem? parent = default) => new()
-    {
-        Parent = parent,
-        Path = path,
-        IsDirectory = false,
-        Name = GetFileName(path),
-        Files = []
-    };
+    
+    public OFiley CreateFile(FileInfo fileInfo, IFileyItem parent)=>
+        new(fileInfo)
+        {
+            FileSystemInfo = fileInfo,
+            Parent = parent,
+            Path = fileInfo.FullName,
+            IsDirectory = false,
+            Name = GetFileName(fileInfo.FullName),
+            Files = [],
+            Size = fileInfo.Length
+        };
 
-    public OFiley CreateDirectory(string path, IFileyItem? parent = default) => new()
-    {
-        Parent = parent,
-        Path = path,
-        Name = GetFileName(path),
-        IsDirectory = true,
-        Files = new ObservableCollection<IFileyItem>()
-    };
+    public OFiley CreateDirectory(DirectoryInfo dirInfo, IFileyItem parent)=>
+        new(dirInfo)
+        {
+            Parent = parent,
+            Path = dirInfo.FullName,
+            IsDirectory = true,
+            Name = GetFileName(dirInfo.FullName),
+            Files = new ObservableCollection<IFileyItem>(),
+        };
 
+    public OFiley CreateDrive(DriveInfo dirInfo)=>
+        new(dirInfo.RootDirectory)
+        {
+            Parent = null,
+            Path = dirInfo.RootDirectory.FullName,
+            IsDirectory = true,
+            Name = GetFileName(dirInfo.RootDirectory.FullName),
+            Files = new ObservableCollection<IFileyItem>(),
+        };
 }

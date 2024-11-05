@@ -7,6 +7,7 @@ using Avalonia.Controls.Selection;
 using Avalonia.Input;
 using FileyCore;
 using FileyCore.Interfaces;
+using DateTime = System.DateTime;
 
 namespace AFiley;
 public class AFiley : TemplatedControl
@@ -50,17 +51,24 @@ public class AFiley : TemplatedControl
             Columns =
             {
                 new HierarchicalExpanderColumn<IFileyItem>(
-                    new TemplateColumn<IFileyItem>("Name", new FileDataTemplate())
+                    new TemplateColumn<IFileyItem>("Name", new FileNameTemplate())
                     {
                         Options  =
                         {
-                            IsTextSearchEnabled = true,
                             CompareAscending = (x, y) => string.CompareOrdinal(x?.Name, y?.Name),
                             CompareDescending = (x, y)=>string.CompareOrdinal(y?.Name, x?.Name)
                         }
                     },
                     x=>x.Files),
-                new TextColumn<IFileyItem,bool>("IsDirectory", x=>x.IsDirectory)
+                new TemplateColumn<IFileyItem>("Size", new FileSizeTemplate())
+                {
+                    Options =
+                    {
+                        CompareAscending = (x, y) => x?.Size.CompareTo(y?.Size) ?? 0,
+                        CompareDescending= (x, y) => y?.Size.CompareTo(x?.Size) ?? 0,
+                    }
+                },
+                new TextColumn<IFileyItem,DateTime>("DateModiefied", x=>x.FileSystemInfo.LastWriteTime)
             }
         };
         FileSource.RowSelection.SelectionChanged += OnSelectionChanged;
@@ -121,7 +129,9 @@ public class AFiley : TemplatedControl
     
     public void Load()
     {
-        InitFileSource(new ObservableCollection<IFileyItem>(FileMethods.GetDrives()));
+        var items = new ObservableCollection<IFileyItem>();
+        FileMethods.LoadDrives(items);
+        InitFileSource(items);
     }
 
     private (int, IFileyItem?) IndexOf(IEnumerable<IFileyItem> items, string name)

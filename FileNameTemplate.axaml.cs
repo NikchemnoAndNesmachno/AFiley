@@ -6,9 +6,9 @@ using FileyCore.Interfaces;
 namespace AFiley;
 
 
-public class FileDataTemplate : IDataTemplate
+public class FileNameTemplate : IDataTemplate
 {
-    public FileDataTemplate()
+    public FileNameTemplate()
     {
         AvaloniaXamlLoader.Load(this);
     }
