@@ -13,12 +13,10 @@ public class FileNameTemplate : IDataTemplate
         AvaloniaXamlLoader.Load(this);
     }
     [Content] public Dictionary<string, IDataTemplate> Templates { get; set; } = [];
-    public Control? Build(object? param)
-    {
-        if (param is not IFileyItem tagValue) return null;
-        if (tagValue.IsDirectory) return Templates["Directory"].Build(param);
-        return Templates["File"].Build(param);
-    }
+    public Control? Build(object? param) => 
+        param is IFileyItem { IsDirectory: false } ? 
+            Templates["Directory"].Build(param) :
+            null;
 
     public bool Match(object? data) => data is IFileyItem;
 }

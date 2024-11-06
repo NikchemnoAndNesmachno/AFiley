@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:aFiley="clr-namespace:AFiley"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AFiley.SelectedFileList">
+    <ListBox 
+        x:Name="SelectedItems"
+        ItemsSource="{Binding $parent[aFiley:SelectedFileList].SelectedFiles, Mode=TwoWay}">
+        <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="system:String">
+                <DockPanel>
+                    <Button 
+                        DockPanel.Dock="Right"
+                        Content="-" 
+                        Command="{Binding $parent[aFiley:SelectedFileList].Remove}"
+                        CommandParameter="{Binding .}"/>
+                    <TextBox Text="{Binding}"/>
+                </DockPanel>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</UserControl>

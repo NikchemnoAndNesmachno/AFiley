@@ -20,7 +20,8 @@ public class OFileyFabric: IFileyFabric<OFiley>
             IsDirectory = false,
             Name = GetFileName(fileInfo.FullName),
             Files = [],
-            Size = fileInfo.Length
+            Size = fileInfo.Length,
+            DateModified = fileInfo.LastWriteTime
         };
 
     public OFiley CreateDirectory(DirectoryInfo dirInfo, IFileyItem parent)=>
@@ -31,6 +32,7 @@ public class OFileyFabric: IFileyFabric<OFiley>
             IsDirectory = true,
             Name = GetFileName(dirInfo.FullName),
             Files = new ObservableCollection<IFileyItem>(),
+            DateModified = dirInfo.LastWriteTime
         };
 
     public OFiley CreateDrive(DriveInfo dirInfo)=>

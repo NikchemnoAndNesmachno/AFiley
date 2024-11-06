@@ -2,122 +2,21 @@ using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
-using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Selection;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 using FileyCore;
 using FileyCore.Interfaces;
-using DateTime = System.DateTime;
 
 namespace AFiley;
-public class AFiley : TemplatedControl
+
+public partial class AFiley : UserControl
 {
-    private TreeDataGrid? _tree;
-    private HierarchicalTreeDataGridSource<IFileyItem> _fileSource;
-
-    public static readonly DirectProperty<AFiley, HierarchicalTreeDataGridSource<IFileyItem>> FileSourceProperty =
-        AvaloniaProperty.RegisterDirect<AFiley, HierarchicalTreeDataGridSource<IFileyItem>>(nameof(FileSource),
-            o => o.FileSource, 
-            (o, v) => o.FileSource = v);
-
-    public HierarchicalTreeDataGridSource<IFileyItem> FileSource
-    {
-        get => _fileSource;
-        set => SetAndRaise(FileSourceProperty, ref _fileSource, value);
-    }
-
-    public static readonly StyledProperty<IFileyItem> SelectedItemProperty =
-        AvaloniaProperty.Register<AFiley, IFileyItem>(nameof(SelectedItem));
-
-    public static readonly StyledProperty<string> SelectedIndexProperty =
-        AvaloniaProperty.Register<AFiley, string>(nameof(SelectedIndex));
-
-    public string SelectedIndex
-    {
-        get => GetValue(SelectedIndexProperty);
-        set => SetValue(SelectedIndexProperty, value);
-    }
-
-    public IFileyItem SelectedItem
-    {
-        get => GetValue(SelectedItemProperty);
-        set => SetValue(SelectedItemProperty, value);
-    }
-
-    public void InitFileSource(IEnumerable<IFileyItem> items)
-    {
-        FileSource = new HierarchicalTreeDataGridSource<IFileyItem>(items)
-        {
-            Columns =
-            {
-                new HierarchicalExpanderColumn<IFileyItem>(
-                    new TemplateColumn<IFileyItem>("Name", new FileNameTemplate())
-                    {
-                        Options  =
-                        {
-                            CompareAscending = (x, y) => string.CompareOrdinal(x?.Name, y?.Name),
-                            CompareDescending = (x, y)=>string.CompareOrdinal(y?.Name, x?.Name)
-                        }
-                    },
-                    x=>x.Files),
-                new TemplateColumn<IFileyItem>("Size", new FileSizeTemplate())
-                {
-                    Options =
-                    {
-                        CompareAscending = (x, y) => x?.Size.CompareTo(y?.Size) ?? 0,
-                        CompareDescending= (x, y) => y?.Size.CompareTo(x?.Size) ?? 0,
-                    }
-                },
-                new TextColumn<IFileyItem,DateTime>("DateModiefied", x=>x.FileSystemInfo.LastWriteTime)
-            }
-        };
-        FileSource.RowSelection.SelectionChanged += OnSelectionChanged;
-    }
-    public AFiley()
-    {
-        InitFileSource([]);
-    }
-
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        _tree = e.NameScope.Find<TreeDataGrid>("PART_tree");
-        if (_tree is not null)
-        {
-            _tree.DoubleTapped += OnDoubleTapped;
-        }
-        base.OnApplyTemplate(e);
-    }
-
-    private void OnSelectionChanged(object? sender, TreeSelectionModelSelectionChangedEventArgs e)
-    {
-        if(e.SelectedIndexes.Count == 0) return;
-        var item = e.SelectedItems[0];
-        var index = e.SelectedIndexes[0];
-        if (item is not IFileyItem selectedFile) return;
-        SelectedItem = selectedFile;
-        SelectedIndex = string.Join(" ", index.ToArray());
-        CurrentPath = SelectedItem.Path;
-    }
-
-    public void OnDoubleTapped(object? sender, TappedEventArgs e)
-    {
-        var item = FileSource.RowSelection?.SelectedItem;
-        if(item is null) return;
-        try
-        {
-            FileMethods.LoadFull(item);
-        }
-        catch (UnauthorizedAccessException exception)
-        {
-            Console.WriteLine(exception);
-        }
-        
-    }
-
-    public FileMethod FileMethods { get; set; } = new()
-    {
-        FileyFabric = new OFileyFabric()
-    };
+    private FlatTreeDataGridSource<IFileyItem> FlatSource;
+    private HierarchicalTreeDataGridSource<DirectoryInfo> TreeSource;
+    
     public static readonly StyledProperty<string> CurrentPathProperty =
         AvaloniaProperty.Register<AFiley, string>(nameof(CurrentPath));
 
@@ -127,12 +26,109 @@ public class AFiley : TemplatedControl
         set => SetValue(CurrentPathProperty, value);
     }
     
-    public void Load()
+    public FileMethod FileMethods { get; set; } = new()
     {
-        var items = new ObservableCollection<IFileyItem>();
-        FileMethods.LoadDrives(items);
-        InitFileSource(items);
+        FileyFabric = new OFileyFabric()
+    };
+    public AFiley()
+    {
+        InitializeComponent();
     }
+
+    private void InitTableSource(IEnumerable<IFileyItem> items)
+    {
+        
+        FlatSource = new FlatTreeDataGridSource<IFileyItem>(items)
+        {
+            Columns =
+            {
+                new TextColumn<IFileyItem,string>("Name", x=> x.Name)
+                {
+                  Options  =
+                  {
+                      CompareAscending = (x, y) =>
+                      {
+                          if (x is null || y is null) return 0;
+                          return x.IsDirectory && !y.IsDirectory ? -1 : string.CompareOrdinal(x.Name, y.Name);
+                      },
+                      CompareDescending= (x, y) =>
+                      {
+                          if (x is null || y is null) return 0;
+                          return y.IsDirectory && !x.IsDirectory ? -1 : string.CompareOrdinal(y.Name, x.Name);
+                      }
+                  }
+                },
+                new TemplateColumn<IFileyItem>("Size", new FileSizeTemplate())
+                {
+                    Options =
+                    {
+                        CompareAscending = (x, y)=>x?.Size.CompareTo(y?.Size) ?? 0,
+                        CompareDescending = (x, y)=>y?.Size.CompareTo(x?.Size) ?? 0,
+                    }
+                },
+                new TextColumn<IFileyItem,DateTime>("Date modified", x=>x.DateModified)
+            }
+        };
+        FileTable.Source = FlatSource;
+    }
+    private void InitTreeSource(IEnumerable<DirectoryInfo> items)
+    {
+        TreeSource = new HierarchicalTreeDataGridSource<DirectoryInfo>(items)
+        {
+            Columns =
+            {
+                new HierarchicalExpanderColumn<DirectoryInfo>(
+                    new TextColumn<DirectoryInfo,string>
+                        ("Directory", x=> x.Name),
+                    x =>
+                    {
+                        try
+                        {
+                            return x.GetDirectories();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            return [];
+                        }
+                    })
+                
+            }
+        };
+        TreeSource.RowSelection.SelectionChanged += OnTreeSelectionChanged;
+        FileTree.Source = TreeSource;
+    }
+
+    private void OnTreeSelectionChanged(object? sender, TreeSelectionModelSelectionChangedEventArgs e)
+    {
+        /*if(e.SelectedIndexes.Count == 0) return;
+        var item = e.SelectedItems[0];
+        var index = e.SelectedIndexes[0];
+        if (item is not DirectoryInfo selectedDir) return;
+        CurrentPath = selectedDir.FullName;
+        try
+        {
+            FileMethods.LoadFull(selectedDir);
+            InitTableSource(selectedDir.Files);
+            var rowIndex = FileTree.Rows.ModelIndexToRowIndex(index);
+            FileTree.RowsPresenter?.BringIntoView(rowIndex);
+            TreeSource.Expand(index);
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            Console.WriteLine(exception);
+        }
+        */
+    }
+
+    public void LoadDrives()
+    {
+        var drives = DriveInfo.GetDrives();
+
+        var items = drives.Select(x => x.RootDirectory);
+        InitTreeSource(items);
+    }
+    
 
     private (int, IFileyItem?) IndexOf(IEnumerable<IFileyItem> items, string name)
     {
@@ -148,12 +144,12 @@ public class AFiley : TemplatedControl
         return (-1, null);
     }
     
-    public void Browse()
+    public void Browse(object? sender, RoutedEventArgs routedEventArgs)
     {
-        if(!Path.Exists(CurrentPath)) return;
+        /*if(!Path.Exists(CurrentPath)) return;
         var segments = new Uri(CurrentPath).Segments;
         var indexes = new IndexPath();
-        var collectionToFind = FileSource.Items.ToArray();
+        var collectionToFind = TreeSource.Items.ToArray();
         for (int i = 0; i < segments.Length; i++)
         {
             var name = Uri.UnescapeDataString(i == 0 ? segments[i] : segments[i].TrimEnd('/'));
@@ -161,11 +157,26 @@ public class AFiley : TemplatedControl
             if (index == -1 || item is null) return;
             indexes = indexes.Append(index);
             FileMethods.LoadFull(item);
-            collectionToFind = item.Files.ToArray();
+            //collectionToFind = item.Files.ToArray();
         }
-        FileSource.RowSelection?.Select(indexes);
-        FileSource.Expand(indexes);
+        TreeSource.Expand(indexes);
+        TreeSource.RowSelection?.Select(indexes);*/
+    }
+
+    private void Load(object? sender, RoutedEventArgs e)
+    {
+        LoadDrives();
+    }
+
+    private void FileTable_OnDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        var selectedTableItem = FlatSource.RowSelection?.SelectedItem;
+        if (selectedTableItem is null || !selectedTableItem.IsDirectory) return;
+        var selectedTableItemIndex = FlatSource.RowSelection?.SelectedIndex;
+        var selectedTreeItemIndex = TreeSource.RowSelection?.SelectedIndex;
+        if(selectedTableItemIndex is null || selectedTreeItemIndex is null) return;
+        var treeIndex = selectedTreeItemIndex.Value.Append(selectedTableItemIndex.Value[0]);
+        TreeSource.RowSelection?.Select(treeIndex);
 
     }
-    
 }
