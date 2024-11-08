@@ -12,12 +12,16 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FileyCore\FileyCore.csproj" />
+      <ProjectReference Include="..\..\CombinedCollections\CombinedCollections\CombinedCollections.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <Compile Update="FileSizeTemplate.axaml.cs">
         <DependentUpon>FileSizeTemplate.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="AFileyFilePicker.axaml.cs">
+        <DependentUpon>AFileyFilePicker.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
     </ItemGroup>

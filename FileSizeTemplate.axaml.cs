@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
-using FileyCore.Interfaces;
 namespace AFiley;
 
 
@@ -12,13 +11,12 @@ public class FileSizeTemplate : IDataTemplate
     {
         AvaloniaXamlLoader.Load(this);
     }
-    [Content] public Dictionary<string, IDataTemplate> Templates { get; set; } = [];
+    [Content] public IDataTemplate SizeTemplate { get; set; }
     public Control? Build(object? param)
     {
-        if (param is not IFileyItem tagValue) return null;
-        if (tagValue.IsDirectory) return null;
-        return Templates["File"].Build(param);
+        if (param is not FileItem file) return null;
+        return SizeTemplate.Build(param);
     }
 
-    public bool Match(object? data) => data is IFileyItem;
+    public bool Match(object? data) => data is IFileItem;
 }

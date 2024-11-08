@@ -1,26 +1,24 @@
 using System.Collections.ObjectModel;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Controls.Selection;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 
 namespace AFiley;
 
-public partial class AFileyDirectoryPicker : UserControl
+public partial class AFileyFilePicker : UserControl
 {
-    private FlatTreeDataGridSource<DirectoryItem> _flatSource;
+    private FlatTreeDataGridSource<IFileItem> _flatSource;
     private HierarchicalTreeDataGridSource<DirectoryItem> _treeSource;
     
-    public IList<string> SelectedDirectories
+    public IList<string> SelectedFiles
     {
         get => SelectedFileList.SelectedFiles;
         set => SelectedFileList.SelectedFiles = value;
     }
     
-    public AFileyDirectoryPicker()
+    public AFileyFilePicker()
     {
         InitializeComponent();
     }
@@ -28,7 +26,7 @@ public partial class AFileyDirectoryPicker : UserControl
     private void FileTable_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
         var selectedTableItem = _flatSource.RowSelection?.SelectedItem;
-        if (selectedTableItem is null) return;
+        if (selectedTableItem is FileItem) return;
         var selectedTableItemIndex = _flatSource.RowSelection?.SelectedIndex;
         var selectedTreeItemIndex = _treeSource.RowSelection?.SelectedIndex;
         if(selectedTableItemIndex is null || selectedTreeItemIndex is null) return;
@@ -60,27 +58,42 @@ public partial class AFileyDirectoryPicker : UserControl
         FileTree.Source = _treeSource;
     }
     
-    private void InitTableSource(IEnumerable<DirectoryItem> items)
+    private void InitTableSource(IEnumerable<IFileItem> items)
     {
         
-        _flatSource = new FlatTreeDataGridSource<DirectoryItem>(items)
+        _flatSource = new FlatTreeDataGridSource<IFileItem>(items)
         {
             Columns =
             {
-                new TextColumn<DirectoryItem,string>("Name", x=> x.DirectoryInfo.Name),
-                new TextColumn<DirectoryItem,DateTime>("Creation date", x=>x.DirectoryInfo.CreationTime)
+                new TextColumn<IFileItem,string>("Name", x =>x.Name,
+                    options: new TextColumnOptions<IFileItem>
+                {
+                    CompareAscending = Comparisons.FileItemNameCompare,
+                    CompareDescending = Comparisons.FileItemNameCompareDesc
+                }),
+                new TemplateColumn<IFileItem>("Size", new FileSizeTemplate(),
+                    options: new TemplateColumnOptions<IFileItem>
+                    {
+                        CompareAscending = Comparisons.FileItemSizeCompare,
+                        CompareDescending = Comparisons.FileItemSizeCompareDesc
+                    }),
+                new TextColumn<IFileItem,DateTime>("Creation date", x=>x.CreationTime)
             }
         };
         _flatSource.RowSelection.SelectionChanged += OnFlatSelectionChanged;
         FileTable.Source = _flatSource;
     }
 
-    private void OnFlatSelectionChanged(object? sender, TreeSelectionModelSelectionChangedEventArgs<DirectoryItem> e)
+    private void OnFlatSelectionChanged(object? sender, TreeSelectionModelSelectionChangedEventArgs<IFileItem> e)
     {
         if(e.SelectedItems.Count == 0) return;
         var item = e.SelectedItems[0];
-        if(item is null) return;
-        CurrentPathBox.Text = item.DirectoryInfo.FullName;
+        CurrentPathBox.Text = item switch
+        {
+            FileItem file => file.FileInfo.FullName,
+            DirectoryItem dir => dir.DirectoryInfo.FullName,
+            _ => CurrentPathBox.Text
+        };
     }
 
     private void OnTreeSelectionChanged(object? sender, TreeSelectionModelSelectionChangedEventArgs<DirectoryItem> e)
@@ -93,9 +106,10 @@ public partial class AFileyDirectoryPicker : UserControl
         if (item.Directories.Count == 0)
         {
             item.ReadDirectories();
+            item.ReadFiles();
         }
 
-        InitTableSource(item.Directories);
+        InitTableSource(item.AllItems);
         
         var index = e.SelectedIndexes[0];
         var rowIndex = FileTree.Rows.ModelIndexToRowIndex(index);
@@ -135,7 +149,7 @@ public partial class AFileyDirectoryPicker : UserControl
     private void AddToSelected(object? sender, RoutedEventArgs e)
     {
         if(string.IsNullOrEmpty(CurrentPathBox.Text)) return;
-        SelectedDirectories.Add(CurrentPathBox.Text);
+        SelectedFiles.Add(CurrentPathBox.Text);
     }
 
     private void FileTree_OnDoubleTapped(object? sender, TappedEventArgs e)
