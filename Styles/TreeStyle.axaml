@@ -1,0 +1,27 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="clr-namespace:AFiley">
+    <StyleInclude Source="TextStyle.axaml"/>
+    <Style Selector="conv|AFileyFilePicker TreeDataGrid#FileTree TreeDataGridRow ToggleButton">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="Width" Value="{Binding $self.Height}"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Viewbox VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <TextBlock
+                    x:Name="Part_text"
+                    Classes="Ico Folder"/>
+                </Viewbox>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^ /template/ TextBlock#Part_text.Folder">
+            <Setter Property="Foreground" Value="Red"/>
+        </Style>
+        <Style Selector="^:checked /template/ TextBlock#Part_text.Folder">
+            <Setter Property="Foreground" Value="Lime"/>
+        </Style>
+    </Style>
+</Styles>

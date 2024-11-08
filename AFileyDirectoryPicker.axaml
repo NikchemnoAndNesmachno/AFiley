@@ -6,7 +6,9 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="AFiley.AFileyDirectoryPicker">
     <UserControl.Styles>
-        <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/>    
+        <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/>
+        <StyleInclude Source="/Styles/ButtonStyle.axaml"/>
+        <StyleInclude Source="/Styles/TreeStyle.axaml"/>
     </UserControl.Styles>
     <DockPanel>
         <StackPanel
@@ -14,14 +16,14 @@
             Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
                 <TextBox x:Name="CurrentPathBox"/>
-                <Button Content="Додати" 
+                <Button Classes="Ico Add"
                         Click="AddToSelected"/>
             </StackPanel>
             
             <StackPanel Orientation="Horizontal">
-                <Button Content="Оновити"
+                <Button Classes="Ico Refresh"
                         Click="LoadDrives"/>
-                <Button Content="Перейти"
+                <Button Classes="Ico Go"
                         Click="GoTo"/>
             </StackPanel>
         </StackPanel>

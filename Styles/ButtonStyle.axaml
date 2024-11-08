@@ -1,0 +1,38 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+
+    <Styles.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/FontValues.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Styles.Resources>
+    <Style Selector="Button.Ico">
+        <Setter Property="FontFamily" Value="{StaticResource IcoFont}"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Style Selector="^.Add">
+            <Setter Property="Content" Value="{StaticResource IcoAdd}"/>
+        </Style>
+        <Style Selector="^.Remove">
+            <Setter Property="Content" Value="{StaticResource IcoRemove}"/>
+        </Style>
+        <Style Selector="^.Refresh">
+            <Setter Property="Content" Value="{StaticResource IcoRefresh}"/>
+        </Style>
+        <Style Selector="^.File">
+            <Setter Property="Content" Value="{StaticResource IcoFile}"/>
+        </Style>
+        <Style Selector="^.Folder">
+            <Setter Property="Content" Value="{StaticResource IcoFolder}"/>
+        </Style>
+        <Style Selector="^.Go">
+            <Setter Property="Content" Value="{StaticResource IcoGo}"/>
+        </Style>
+    </Style>
+</Styles>

@@ -65,12 +65,14 @@ public partial class AFileyFilePicker : UserControl
         {
             Columns =
             {
-                new TextColumn<IFileItem,string>("Name", x =>x.Name,
-                    options: new TextColumnOptions<IFileItem>
-                {
-                    CompareAscending = Comparisons.FileItemNameCompare,
-                    CompareDescending = Comparisons.FileItemNameCompareDesc
-                }),
+                new TemplateColumn<IFileItem>("Name",
+                    cellTemplate: DataTemplates[0],
+                    options: new TemplateColumnOptions<IFileItem> 
+                    {
+                        MaxWidth = new GridLength(200, GridUnitType.Pixel),
+                        CompareAscending = Comparisons.FileItemNameCompare,
+                        CompareDescending = Comparisons.FileItemNameCompareDesc
+                    }),
                 new TemplateColumn<IFileItem>("Size", new FileSizeTemplate(),
                     options: new TemplateColumnOptions<IFileItem>
                     {

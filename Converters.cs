@@ -1,3 +1,5 @@
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Data.Converters;
 
 namespace AFiley;
@@ -13,5 +15,10 @@ public static class Converters
         < Sizes.Tb => $"{size / Sizes.Gb} GB",
         _ => ""
     });
-
+    
+    public static FuncValueConverter<TreeDataGridRow?, bool> IsDirectoryDataContextConverter { get; } = 
+        new(textBlock => textBlock?.DataContext is DirectoryItem);
+    
+    public static FuncValueConverter<TextBlock?, bool> IsFileDataContextConverter { get; } = 
+        new(textBlock => textBlock?.DataContext is FileItem);
 }

@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+    <FontFamily x:Key="IcoFont">avares://AFiley/Resources/#Ico</FontFamily>
+    <system:String x:Key="IcoRemove">&#xe900;</system:String>
+    <system:String x:Key="IcoGo">&#xe901;</system:String>
+    <system:String x:Key="IcoRefresh">&#xe902;</system:String>
+    <system:String x:Key="IcoAdd">&#xe903;</system:String>
+    <system:String x:Key="IcoFolder">&#xe904;</system:String>
+    <system:String x:Key="IcoFile">&#xe905;</system:String>
+</ResourceDictionary>

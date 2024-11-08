@@ -6,20 +6,23 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="AFiley.SelectedFileList">
-    <ListBox 
+    <UserControl.Styles>
+        <StyleInclude Source="/Styles/ButtonStyle.axaml"/>
+    </UserControl.Styles>
+    <ItemsControl 
         x:Name="SelectedItems"
         ItemsSource="{Binding $parent[aFiley:SelectedFileList].SelectedFiles, Mode=TwoWay}">
-        <ListBox.ItemTemplate>
+        <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="system:String">
                 <DockPanel>
                     <Button 
                         DockPanel.Dock="Right"
-                        Content="-" 
+                        Classes="Ico Remove"
                         Command="{Binding $parent[aFiley:SelectedFileList].Remove}"
                         CommandParameter="{Binding .}"/>
                     <TextBox Text="{Binding}"/>
                 </DockPanel>
             </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
 </UserControl>

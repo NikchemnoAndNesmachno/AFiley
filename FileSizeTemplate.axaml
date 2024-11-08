@@ -6,6 +6,9 @@
              x:Class="AFiley.FileSizeTemplate"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450">
     <DataTemplate x:DataType="afiley:FileItem">
-        <TextBlock Text="{Binding FileInfo.Length, Converter={x:Static afiley:Converters.SizeConverter}}"/>
+        <TextBlock x:Name="SizeText" 
+                   VerticalAlignment="Center"
+                   Text="{Binding FileInfo.Length, 
+                   Converter={x:Static afiley:Converters.SizeConverter}}"/>
     </DataTemplate>
 </IDataTemplate>

@@ -13,8 +13,8 @@ public class DirectoryItem: IFileItem
     public DirectoryItem(DirectoryInfo info)
     {
         DirectoryInfo = info;
-        Directories = new ObservableCollection<DirectoryItem>();
-        Files = new ObservableCollection<FileItem>();
+        Directories = [];
+        Files = [];
         AllItems = new CombinedNotifyingList<IFileItem>(Directories, Files);
         AllItems.SetForNotifying(Directories, Files);
         Name = info.Name;
@@ -29,7 +29,6 @@ public class DirectoryItem: IFileItem
             foreach (var dir in dirs)
             {
                 Directories.Add(new DirectoryItem(dir));
-                //AllItems.Add(new DirectoryItem(dir));
             }
             
         }

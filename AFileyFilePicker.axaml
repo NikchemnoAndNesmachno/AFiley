@@ -6,22 +6,54 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="AFiley.AFileyFilePicker">
     <UserControl.Styles>
-        <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/>    
+        <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/>   
+        <StyleInclude Source="/Styles/ButtonStyle.axaml"/>
+        <StyleInclude Source="/Styles/TreeStyle.axaml"/>
     </UserControl.Styles>
+    <UserControl.DataTemplates>
+        <controls:FileNameTemplate>
+            <DataTemplate x:DataType="controls:FileItem">
+                <DockPanel>
+                    <TextBlock
+                        Margin="2"
+                        DockPanel.Dock="Left"
+                        VerticalAlignment="Center"
+                        Foreground="DodgerBlue"
+                        Classes="Ico File"/>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding Name}"/>
+                </DockPanel>
+            </DataTemplate>
+            <DataTemplate x:DataType="controls:DirectoryItem">
+                <DockPanel>
+                    <TextBlock
+                        Margin="2"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Foreground="Lime"
+                        Classes="Ico Folder"/>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding Name}"/>
+                </DockPanel>
+            </DataTemplate>
+        </controls:FileNameTemplate>
+    </UserControl.DataTemplates>
     <DockPanel>
         <StackPanel
             DockPanel.Dock="Top"
             Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
                 <TextBox x:Name="CurrentPathBox"/>
-                <Button Content="Додати" 
+                <Button Classes="Ico Add" 
                         Click="AddToSelected"/>
             </StackPanel>
             
             <StackPanel Orientation="Horizontal">
-                <Button Content="Оновити"
+                <Button Classes="Ico Refresh"
                         Click="LoadDrives"/>
-                <Button Content="Перейти"
+                <Button Classes="Ico Go"
                         Click="GoTo"/>
             </StackPanel>
         </StackPanel>
