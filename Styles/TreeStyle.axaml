@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:conv="clr-namespace:AFiley">
     <StyleInclude Source="TextStyle.axaml"/>
-    <Style Selector="conv|AFileyFilePicker TreeDataGrid#FileTree TreeDataGridRow ToggleButton">
+    <Style Selector=":is(conv|AFileyPickerBase) TreeDataGrid#FileTree TreeDataGridRow ToggleButton">
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="Width" Value="{Binding $self.Height}"/>

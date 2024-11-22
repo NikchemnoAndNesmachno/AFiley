@@ -55,6 +55,11 @@ public class DirectoryItem: IFileItem
         }
     }
 
+    public bool IsDirectory => true;
+
     public string Name { get; set; }
+
+    public string FullName => DirectoryInfo.FullName;
+
     public DateTime CreationTime { get; set; }
 }

@@ -26,6 +26,9 @@ public static class Comparisons
     public static readonly Comparison<IFileItem?> SameFileItemNameCompare = (x, y) =>
         string.CompareOrdinal(x?.Name, y?.Name);
 
+    public static readonly Comparison<IFileItem?> SameFileItemNameCompareDesc = (x, y) =>
+        SameFileItemNameCompare(y, x);
+
     public static readonly Comparison<IFileItem?> FileItemSizeCompare = (x, y) => 
         x is FileItem xInfo && y is FileItem yInfo ?
             FileSizeCompare(xInfo, yInfo) : 0;

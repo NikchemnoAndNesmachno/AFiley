@@ -12,16 +12,16 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\CombinedCollections\CombinedCollections\CombinedCollections.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Update="FileSizeTemplate.axaml.cs">
         <DependentUpon>FileSizeTemplate.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
-      <Compile Update="AFileyFilePicker.axaml.cs">
+      <Compile Update="AFileyFilePicker.cs">
         <DependentUpon>AFileyFilePicker.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="AFileyPickerBase.axaml.cs">
+        <DependentUpon>AFileyPickerBase.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
     </ItemGroup>
@@ -29,6 +29,10 @@
     <ItemGroup>
       <None Remove="Resources\Ico.ttf" />
       <AvaloniaResource Include="Resources\Ico.ttf" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\CombinedCollections\CombinedCollections\CombinedCollections.csproj" />
     </ItemGroup>
 
 </Project>
